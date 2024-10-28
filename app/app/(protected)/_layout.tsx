@@ -27,6 +27,10 @@ export default function ProtectedLayout() {
 						iconName = focused ? "search" : "search-outline";
 					} else if (route.name === "settings") {
 						iconName = focused ? "person" : "person-outline";
+					} else if (route.name === "community") {
+						iconName = focused ? "people" : "people-outline";
+					} else if (route.name === "weather") {
+						iconName = focused ? "cloud" : "cloud-outline";
 					}
 
 					return <Ionicons name={iconName as any} size={size} color="black" />;
@@ -34,8 +38,17 @@ export default function ProtectedLayout() {
 			})}
 		>
 			<Tabs.Screen name="home" />
+			<Tabs.Screen name="weather" />
+			<Tabs.Screen name="community" />
 			<Tabs.Screen name="explore" />
 			<Tabs.Screen name="settings" />
+			<Tabs.Screen name="results" options={{
+				href: null,
+			}} />
+			<Tabs.Screen name="disease-details" options={{
+				href: null,
+			}} />
+
 		</Tabs>
 	);
 }
