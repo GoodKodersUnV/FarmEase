@@ -1,20 +1,55 @@
-import React, { useState, useEffect } from 'react';
-import { Pause, Play } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
+'use client'
 
-const TextToSpeech = () => {
-  const [text, setText] = useState('');
+import React, { useState, useEffect } from 'react';
+import { Pause, Play, Globe } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+
+interface TextToSpeechProps {
+  originalText: string;
+  onLanguageChange?: (translatedText: string) => void;
+}
+
+// Supported languages
+const languages = [
+  { code: 'en', name: 'English' },
+  { code: 'hi', name: 'Hindi' },
+  { code: 'te', name: 'Telugu' },
+  { code: 'ta', name: 'Tamil' },
+  { code: 'kn', name: 'Kannada' },
+];
+
+const TextToSpeech: React.FC<TextToSpeechProps> = ({ 
+  originalText,
+  onLanguageChange 
+}) => {
   const [isPlaying, setIsPlaying] = useState(false);
-  const [speechSynth, setSpeechSynth] = useState(null);
-  const [utterance, setUtterance] = useState(null);
+  const [speechSynth, setSpeechSynth] = useState<SpeechSynthesis | null>(null);
+  const [utterance, setUtterance] = useState<SpeechSynthesisUtterance | null>(null);
+  const [currentLanguage, setCurrentLanguage] = useState('en');
+  const [translatedText, setTranslatedText] = useState(originalText);
+  const [voices, setVoices] = useState<SpeechSynthesisVoice[]>([]);
 
   useEffect(() => {
-    // Initialize speech synthesis
-    setSpeechSynth(window.speechSynthesis);
+    if (typeof window !== 'undefined') {
+      setSpeechSynth(window.speechSynthesis);
+      
+      // Initialize voices
+      const loadVoices = () => {
+        setVoices(window.speechSynthesis.getVoices());
+      };
+      
+      loadVoices();
+      window.speechSynthesis.onvoiceschanged = loadVoices;
+    }
+
     return () => {
-      // Cleanup
       if (speechSynth) {
         speechSynth.cancel();
       }
@@ -22,62 +57,105 @@ const TextToSpeech = () => {
   }, []);
 
   useEffect(() => {
-    if (text) {
-      // Create new utterance when text changes
-      const newUtterance = new SpeechSynthesisUtterance(text);
+    setTranslatedText(originalText);
+  }, [originalText]);
+
+  useEffect(() => {
+    if (translatedText) {
+      const newUtterance = new SpeechSynthesisUtterance(translatedText);
+      
+      // Find appropriate voice for the selected language
+      const availableVoice = voices.find(voice => 
+        voice.lang.toLowerCase().includes(currentLanguage.toLowerCase())
+      );
+      if (availableVoice) {
+        newUtterance.voice = availableVoice;
+      }
+      
+      newUtterance.lang = currentLanguage;
       newUtterance.onend = () => setIsPlaying(false);
       setUtterance(newUtterance);
     }
-  }, [text]);
+  }, [translatedText, currentLanguage, voices]);
+
+  const translateText = async (targetLang) => {
+    try {
+      // Google Translate API direct call (simplified without widget script)
+      const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=${targetLang}&dt=t&q=${encodeURIComponent(originalText)}`;
+      const response = await fetch(url);
+  
+      if (!response.ok) {
+        throw new Error(`Translation failed with status ${response.status}`);
+      }
+  
+      const data = await response.json();
+      const translated = data[0].map((item) => item[0]).join('');
+  
+      setTranslatedText(translated);
+      onLanguageChange?.(translated); // Callback for translated text
+      return translated;
+    } catch (error) {
+      console.error("Translation error:", error);
+      return originalText;
+    }
+  };
+  
+  const handleLanguageChange = async (langCode) => {
+    setCurrentLanguage(langCode);
+    if (langCode !== "en") {
+      await translateText(langCode);
+    } else {
+      setTranslatedText(originalText);
+      onLanguageChange?.(originalText);
+    }
+  };
+  
 
   const toggleSpeech = () => {
-    if (!text || !speechSynth) return;
+    if (!translatedText || !speechSynth) return;
 
     if (isPlaying) {
-      speechSynth.pause();
+      speechSynth.cancel();
       setIsPlaying(false);
     } else {
-      if (speechSynth.paused) {
-        speechSynth.resume();
-      } else {
-        speechSynth.cancel();
-        utterance && speechSynth.speak(utterance);
-      }
+      speechSynth.cancel();
+      utterance && speechSynth.speak(utterance);
       setIsPlaying(true);
     }
   };
 
   return (
-    <Card className="w-full max-w-2xl mx-auto">
-      <CardHeader>
-        <CardTitle className="flex items-center justify-between">
-          <span>Text to Speech</span>
-          <Button
-            onClick={toggleSpeech}
-            disabled={!text}
-            variant="outline"
-            className="w-12 h-12 p-2 rounded-full"
-          >
-            {isPlaying ? (
-              <Pause className="w-6 h-6" />
-            ) : (
-              <Play className="w-6 h-6" />
-            )}
-          </Button>
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
-        <Textarea
-          placeholder="Enter text to convert to speech..."
-          value={text}
-          onChange={(e) => setText(e.target.value)}
-          className="min-h-[200px] text-lg p-4"
-        />
-        <div className="mt-4 text-sm text-gray-500">
-          {text ? `Characters: ${text.length}` : 'Enter some text to begin'}
-        </div>
-      </CardContent>
-    </Card>
+    <div className="flex items-center gap-2">
+      <Button
+        onClick={toggleSpeech}
+        variant="outline"
+        size="icon"
+        className="h-8 w-8 rounded-full"
+      >
+        {isPlaying ? (
+          <Pause className="h-4 w-4" />
+        ) : (
+          <Play className="h-4 w-4" />
+        )}
+      </Button>
+      
+      <Select
+        value={currentLanguage}
+        onValueChange={handleLanguageChange}
+      >
+        <SelectTrigger className="w-[130px] h-8">
+          <Globe className="h-4 w-4 mr-2" />
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent className='bg-background'>
+          {languages.map((lang) => (
+            <SelectItem key={lang.code} value={lang.code}>
+              {lang.name}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+    </div>
   );
 };
 
