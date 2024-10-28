@@ -116,13 +116,14 @@ export default function Weather() {
     );
   }
 
+  const placeName = "Pragathi Nagar";
+
   return (
     <ScrollView className="flex-1 bg-green-50">
       <View className="p-4">
         <Text className="text-3xl font-bold mb-4 text-center text-green-900">
-          {weather.name}, {weather.sys.country}
+          {placeName}, {weather.sys.country}
         </Text>
-
         {/* Main Weather Card */}
         <View className="bg-white rounded-xl p-6 mb-4 shadow">
           <View className="flex-row items-center justify-center">

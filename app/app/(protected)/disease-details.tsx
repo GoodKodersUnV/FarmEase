@@ -8,7 +8,7 @@ const DISEASE_INFO: Record<string, any> = {
     description: "Early blight is a serious fungal disease that affects potato plants, caused by the fungus Alternaria solani. It can significantly impact crop yield and quality if left untreated.",
     symptoms: [
       "Dark brown to black lesions with concentric rings (target-like pattern)",
-      "Yellowing and browning of leaves starting from older foliage",
+      "Yellowing and browning of leaves starting from older foliage", 
       "Lesions begin as small brown spots that enlarge over time",
       "Affected leaves eventually wither and die",
       "Stem lesions are dark, slightly sunken and concentric",
@@ -25,7 +25,7 @@ const DISEASE_INFO: Record<string, any> = {
     prevention: [
       "Use certified disease-free seed potatoes",
       "Implement crop rotation with non-host plants for 2-3 years",
-      "Plant resistant varieties when available",
+      "Plant resistant varieties when available", 
       "Maintain proper plant spacing for good airflow",
       "Keep plants well-fertilized to improve disease resistance",
       "Monitor fields regularly for early detection",
@@ -54,7 +54,7 @@ const DISEASE_INFO: Record<string, any> = {
       "Plant certified disease-free seed potatoes",
       "Choose resistant varieties",
       "Avoid overhead irrigation",
-      "Space plants properly for good air circulation",
+      "Space plants properly for good air circulation", 
       "Monitor local disease forecasting systems",
       "Practice strict field sanitation",
       "Store tubers in cool, dry conditions"
@@ -72,7 +72,7 @@ const DISEASE_INFO: Record<string, any> = {
     ],
     maintenance: [
       "Regular balanced fertilization",
-      "Proper irrigation scheduling",
+      "Proper irrigation scheduling", 
       "Routine pest monitoring",
       "Timely weed control",
       "Appropriate hilling practices",
@@ -93,10 +93,8 @@ export default function DiseaseDetailsScreen() {
   const params = useLocalSearchParams<{
     disease: string;
     plantType: string;
-    rawDiseaseName: string; // Add this to receive the original disease name
+    rawDiseaseName: string;
   }>();
-
-  console.log(params);
 
   const diseaseInfo = DISEASE_INFO[params.rawDiseaseName] || {
     description: "Information not available",
@@ -107,44 +105,46 @@ export default function DiseaseDetailsScreen() {
 
   return (
     <ScrollView className="flex-1 bg-white">
-      <View className="p-4">
-        <Text className="text-2xl font-bold mb-4">
-          {params.disease} {/* Use the pre-formatted disease name */}
+      <View className="p-6">
+        <Text className="text-3xl font-bold mb-2 text-green-800">
+          {params.rawDiseaseName}
         </Text>
 
-        <Text className="text-lg mb-2">Plant: {params.plantType}</Text>
+        <Text className="text-xl mb-6 text-green-700 capitalize">
+          Plant: {params.plantType}
+        </Text>
 
-        <View className="mb-6">
-          <Text className="text-xl font-semibold mb-2">Description</Text>
-          <Text className="text-base">{diseaseInfo.description}</Text>
+        <View className="bg-green-50 p-6 rounded-xl mb-6 border border-green-100">
+          <Text className="text-2xl font-semibold mb-3 text-green-800">Description</Text>
+          <Text className="text-base text-green-900">{diseaseInfo.description}</Text>
         </View>
 
-        <View className="mb-6">
-          <Text className="text-xl font-semibold mb-2">Symptoms</Text>
+        <View className="bg-orange-50 p-6 rounded-xl mb-6 border border-orange-100">
+          <Text className="text-2xl font-semibold mb-3 text-orange-800">Symptoms</Text>
           {diseaseInfo.symptoms.map((symptom: string, index: number) => (
-            <Text key={index} className="text-base mb-1">• {symptom}</Text>
+            <Text key={index} className="text-base mb-2 text-orange-900">• {symptom}</Text>
           ))}
         </View>
 
-        <View className="mb-6">
-          <Text className="text-xl font-semibold mb-2">Treatment</Text>
+        <View className="bg-blue-50 p-6 rounded-xl mb-6 border border-blue-100">
+          <Text className="text-2xl font-semibold mb-3 text-blue-800">Treatment</Text>
           {diseaseInfo.treatment.map((item: string, index: number) => (
-            <Text key={index} className="text-base mb-1">• {item}</Text>
+            <Text key={index} className="text-base mb-2 text-blue-900">• {item}</Text>
           ))}
         </View>
 
-        <View className="mb-6">
-          <Text className="text-xl font-semibold mb-2">Prevention</Text>
+        <View className="bg-purple-50 p-6 rounded-xl mb-6 border border-purple-100">
+          <Text className="text-2xl font-semibold mb-3 text-purple-800">Prevention</Text>
           {diseaseInfo.prevention.map((item: string, index: number) => (
-            <Text key={index} className="text-base mb-1">• {item}</Text>
+            <Text key={index} className="text-base mb-2 text-purple-900">• {item}</Text>
           ))}
         </View>
 
         <Button
           onPress={() => router.back()}
-          className="bg-gray-500"
+          className="bg-green-600 py-4 rounded-xl"
         >
-          <Text className="text-white font-semibold">Back to Results</Text>
+          <Text className="text-white text-lg font-bold">Back to Results</Text>
         </Button>
       </View>
     </ScrollView>

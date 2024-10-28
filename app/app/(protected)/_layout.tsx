@@ -37,7 +37,9 @@ export default function ProtectedLayout() {
 				},
 			})}
 		>
-			<Tabs.Screen name="home" />
+			<Tabs.Screen name="home" options={{
+				title: "Crop Disease Detection"
+			}} />
 			<Tabs.Screen name="weather" />
 			<Tabs.Screen name="community" />
 			<Tabs.Screen name="explore" />
