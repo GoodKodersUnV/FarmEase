@@ -1,0 +1,3 @@
+backend/data/**
+backend/training/requirements.txt
+backend/training/.ipynb_checkpoints/**

@@ -1,0 +1,13 @@
+{
+  "expo": {
+    "plugins": [
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "The app needs access to your photos to upload images of diseased crops.",
+          "cameraPermission": "The app needs access to your camera to take photos of diseased crops."
+        }
+      ]
+    ]
+  }
+}
