@@ -48,7 +48,7 @@ const config: Config = {
           900: "#111827",
           950: "#030712",
         },
-        background: "var(--background)",
+        background: "#E2FBED",
         foreground: "var(--foreground)",
         keyframes: {
           "accordion-down": {

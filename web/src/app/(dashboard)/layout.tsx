@@ -5,8 +5,8 @@ import getCurrentUser from "@/actions/getCurrentUser";
 import { User } from "@prisma/client";
 
 export const metadata: Metadata = {
-  title: "VJH",
-  description: "VJH",
+  title: "FarmSense",
+  description: "FarmSense",
 };
 
 export default async function RootLayout({
@@ -15,10 +15,5 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const currentUser = await getCurrentUser();
-  return (
-    <HomeLayout currentUser={currentUser as User}>
-      {children}
-    </HomeLayout>
-  );
+  return <HomeLayout currentUser={currentUser as User}>{children}</HomeLayout>;
 }
-
