@@ -8,6 +8,7 @@ export interface Post {
   comments: Comment[];
   timestamp: string;
   isLiked?: boolean;
+  tags: string[];
 }
 
 export interface Comment {
@@ -20,4 +21,5 @@ export interface Comment {
 export interface NewPost {
   image: string;
   caption: string;
+  tags?: string[];
 } 

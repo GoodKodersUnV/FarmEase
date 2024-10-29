@@ -3,6 +3,7 @@ import { Text, View, StyleSheet, Image, TouchableOpacity, TextInput, ScrollView,
 import { Post, NewPost } from "@/app/types/community";
 import { Heart, MessageCircle, Send, Plus, Image as ImageIcon, X } from "lucide-react-native";
 import * as ImagePicker from "expo-image-picker";
+import { GestureHandlerRootView, ScrollView as GestureScrollView } from "react-native-gesture-handler";
 
 export default function CommunityScreen() {
 	const [posts, setPosts] = useState<Post[]>([
@@ -28,13 +29,14 @@ export default function CommunityScreen() {
 					timestamp: "1h ago"
 				}
 			],
-			timestamp: "3h ago"
+			timestamp: "3h ago",
+			tags: ["Crops", "Success Stories"]
 		},
 		{
 			id: "2",
 			username: "Lakshmi",
 			userAvatar: "https://randomuser.me/api/portraits/women/45.jpg",
-			image: "https://images.unsplash.com/photo-1604300721398-3f58fdf81780?q=80&w=2333&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+				image: "https://images.unsplash.com/photo-1604300721398-3f58fdf81780?q=80&w=2333&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
 			caption: "First batch of organic vegetables ready for the market! 🥬🍅 #FarmFresh #LocalProduce",
 			likes: 98,
 			isLiked: true,
@@ -46,7 +48,8 @@ export default function CommunityScreen() {
 					timestamp: "30m ago"
 				}
 			],
-			timestamp: "5h ago"
+			timestamp: "5h ago",
+			tags: ["Tips", "Market Updates"]
 		},
 		{
 			id: "3",
@@ -57,7 +60,8 @@ export default function CommunityScreen() {
 			likes: 76,
 			isLiked: false,
 			comments: [],
-			timestamp: "1d ago"
+			timestamp: "1d ago",
+			tags: ["Equipment", "Questions"]
 		}
 	]);
 
@@ -65,6 +69,21 @@ export default function CommunityScreen() {
 	const [activeCommentId, setActiveCommentId] = useState<string | null>(null);
 	const [isNewPostModalVisible, setIsNewPostModalVisible] = useState(false);
 	const [newPost, setNewPost] = useState<NewPost>({ image: "", caption: "" });
+	const [selectedCategory, setSelectedCategory] = useState("All");
+
+	const categories = [
+		"All",
+		"Crops",
+		"Tips",
+		"Questions",
+		"Success Stories",
+		"Market Updates",
+		"Equipment"
+	];
+
+	const filteredPosts = posts.filter(post => 
+		selectedCategory === "All" || post.tags.includes(selectedCategory)
+	);
 
 	const handleLike = (postId: string) => {
 		setPosts(posts.map(post => {
@@ -126,7 +145,8 @@ export default function CommunityScreen() {
 			likes: 0,
 			isLiked: false,
 			comments: [],
-			timestamp: "Just now"
+			timestamp: "Just now",
+			tags: []
 		};
 
 		setPosts([post, ...posts]);
@@ -135,9 +155,37 @@ export default function CommunityScreen() {
 	};
 
 	return (
-		<View style={styles.container}>
+		<GestureHandlerRootView style={styles.container}>
+			{/* Categories ScrollView */}
+			<GestureScrollView 
+				horizontal 
+				showsHorizontalScrollIndicator={false} 
+				className="mb-6"
+			>
+				{categories.map((category) => (
+					<TouchableOpacity 
+						key={category}
+						onPress={() => setSelectedCategory(category)}
+						className={`mr-4 px-6 py-3 rounded-full border-2 
+							${selectedCategory === category
+								? "border-green-600 bg-green-50"
+								: "border-gray-200"
+							}`}
+					>
+						<Text className={`font-semibold ${
+							selectedCategory === category
+								? "text-green-800"
+								: "text-gray-600"
+						}`}>
+							{category}
+						</Text>
+					</TouchableOpacity>
+				))}
+			</GestureScrollView>
+
+			{/* Posts ScrollView */}
 			<ScrollView showsVerticalScrollIndicator={false}>
-				{posts.map(post => (
+				{filteredPosts.map(post => (
 					<View key={post.id} className="mb-6 bg-white rounded-3xl shadow-xl border border-green-100 overflow-hidden">
 						{/* Post Header */}
 						<View className="flex-row items-center p-4">
@@ -189,7 +237,7 @@ export default function CommunityScreen() {
 									</TouchableOpacity>
 								</View>
 								<TouchableOpacity>
-									<Send size={24} color="#166534" />
+									<Send size={24} color="#166634" />
 								</TouchableOpacity>
 							</View>
 
@@ -233,6 +281,20 @@ export default function CommunityScreen() {
 									</TouchableOpacity>
 								</View>
 							)}
+						</View>
+
+						{/* Add tags below header */}
+						<View className="px-4 pb-2 flex-row flex-wrap">
+							{post.tags.map((tag, index) => (
+								<View 
+									key={index} 
+									className="bg-green-50 px-3 py-1 rounded-full mr-2 mb-2"
+								>
+									<Text className="text-green-800 text-xs">
+										{tag}
+									</Text>
+								</View>
+							))}
 						</View>
 					</View>
 				))}
@@ -307,7 +369,7 @@ export default function CommunityScreen() {
 					</View>
 				</View>
 			</Modal>
-		</View>
+		</GestureHandlerRootView>
 	);
 }
 
