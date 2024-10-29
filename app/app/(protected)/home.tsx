@@ -3,11 +3,11 @@ import { View, Image, Alert, Platform } from "react-native";
 import { useState, useEffect } from "react";
 import * as ImagePicker from "expo-image-picker";
 import * as Location from "expo-location";
-import * as FileSystem from "expo-file-system";
 import { Button } from "@/components/ui/button";
 import { Select } from "@/components/ui/select";
 import { router } from "expo-router";
 import { cn } from "@/lib/utils";
+import { H1 } from "@/components/ui/typography";
 
 const API_URL = "http://localhost:8000";
 
@@ -28,6 +28,7 @@ export default function HomeScreen() {
   const [locationError, setLocationError] = useState<string | null>(null);
   const [predicting, setPredicting] = useState(false);
   const [selectedPlant, setSelectedPlant] = useState("potato");
+  const [placeName, setPlaceName] = useState<string | null>(null);
 
   useEffect(() => {
     (async () => {
@@ -38,14 +39,31 @@ export default function HomeScreen() {
         }
       }
 
-      const { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== "granted") {
-        setLocationError("Permission to access location was denied");
-        return;
-      }
+      const staticLocation = {
+        coords: {
+          latitude: 17.537188962169562,
+          longitude: 78.38519009404381,
+          accuracy: 0,
+          altitude: null,
+          altitudeAccuracy: null,
+          heading: null,
+          speed: null
+        },
+        timestamp: 0
+      };
+      setLocation(staticLocation);
 
-      const currentLocation = await Location.getCurrentPositionAsync({});
-      setLocation(currentLocation);
+      try {
+        const [place] = await Location.reverseGeocodeAsync({
+          latitude: staticLocation.coords.latitude,
+          longitude: staticLocation.coords.longitude,
+        });
+        if (place) {
+          setPlaceName(place.district || place.region || place.city);
+        }
+      } catch (error) {
+        console.error("Error getting place name:", error);
+      }
     })();
   }, []);
 
@@ -79,14 +97,14 @@ export default function HomeScreen() {
 
     try {
       setPredicting(true);
-      
+
       const formData = new FormData();
       const imageFile = {
         uri: image,
         type: "image/jpeg",
         name: "image.jpg"
       };
-      
+
       formData.append("file", imageFile as any);
 
       const response = await fetch(`${API_URL}/predict`, {
@@ -102,7 +120,7 @@ export default function HomeScreen() {
       }
 
       const result = await response.json();
-      
+
       router.push({
         pathname: "/results",
         params: {
@@ -129,72 +147,74 @@ export default function HomeScreen() {
 
   return (
     <View className="flex-1 p-4 bg-white">
-      <Text className="text-2xl font-bold mb-4 text-center">
-        Crop Disease Detection
-      </Text>
-      
-      <View className="mb-4">
-        <Text className="text-lg font-semibold mb-2">Plant Type:</Text>
+      <View className="bg-blue-50 p-4 rounded-lg mb-6 flex-row justify-between items-center">
+        <View>
+          <Text className="text-lg font-bold mb-1">
+            {placeName || "Loading location..."}
+          </Text>
+          {location && (
+            <Text className="text-sm text-gray-600">
+              📍 {location.coords.latitude.toFixed(4)}, {location.coords.longitude.toFixed(4)}
+            </Text>
+          )}
+        </View>
+        <Button
+          onPress={() => router.push("/weather")}
+          className="bg-blue-500"
+        >
+          <Text className="text-white font-bold">Check Weather</Text>
+        </Button>
+      </View>
+
+      <View className="mb-6">
+        <Text className="text-xl font-bold mb-2">Select Your Crop:</Text>
         <Select
           value={selectedPlant}
           onValueChange={setSelectedPlant}
           items={PLANT_TYPES}
-          className="w-full"
+          className="w-full bg-gray-50 border-2 border-gray-200"
         />
       </View>
-      
-      <View className="mb-4">
-        <Text className="text-lg font-semibold mb-2">Location Status:</Text>
-        {locationError ? (
-          <Text className="text-red-500">{locationError}</Text>
-        ) : location ? (
-          <Text className="text-base">
-            📍 Lat: {location.coords.latitude.toFixed(4)}, Long: {location.coords.longitude.toFixed(4)}
-          </Text>
-        ) : (
-          <Text>Getting location...</Text>
-        )}
-      </View>
 
-      <View className="items-center mb-4">
+      <View className="items-center mb-6">
         {image ? (
-          <Image 
-            source={{ uri: image }} 
-            className="w-[300px] h-[225px] rounded-lg"
+          <Image
+            source={{ uri: image }}
+            className="w-full h-[300px] rounded-xl"
           />
         ) : (
-          <View className="w-[300px] h-[225px] rounded-lg bg-gray-100 justify-center items-center border-2 border-gray-300 border-dashed">
-            <Text>No image selected</Text>
+          <View className="w-full h-[300px] rounded-xl bg-gray-50 justify-center items-center border-2 border-gray-200 border-dashed">
+            <Text className="text-lg text-gray-500 font-semibold">Take or select a photo of your crop</Text>
           </View>
         )}
       </View>
 
-      <View className="flex-row justify-around mb-4">
-        <Button 
+      <View className="flex-row justify-between mb-6">
+        <Button
           onPress={takePhoto}
-          className="w-[45%] bg-slate-600"
+          className="w-[48%] bg-indigo-600 py-4 shadow-md"
         >
-          <Text className="text-white font-semibold">Take Photo</Text>
+          <Text className="text-white text-lg font-bold">📸 Camera</Text>
         </Button>
-        <Button 
+        <Button
           onPress={pickImage}
-          className="w-[45%] bg-slate-600"
+          className="w-[48%] bg-purple-600 py-4 shadow-md"
         >
-          <Text className="text-white font-semibold">Pick from Gallery</Text>
+          <Text className="text-white text-lg font-bold">🖼️ Gallery</Text>
         </Button>
       </View>
- 
+
       {image && (
-        <Button 
-          onPress={handlePredictDisease} 
+        <Button
+          onPress={handlePredictDisease}
           className={cn(
-            "bg-green-500 mt-2",
-            predicting && "bg-gray-500"
+            "bg-orange-500 py-4 shadow-lg",
+            predicting && "bg-gray-400"
           )}
           disabled={predicting}
         >
-          <Text className="text-white font-semibold">
-            {predicting ? "Predicting..." : "Predict Disease"}
+          <Text className="text-white text-xl font-bold">
+            {predicting ? "Analyzing..." : "Detect Disease"}
           </Text>
         </Button>
       )}

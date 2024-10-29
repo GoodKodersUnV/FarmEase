@@ -23,53 +23,61 @@ export default function ResultsScreen() {
       params: {
         disease: params.class,
         plantType: params.plantType,
-        rawDiseaseName: params.class 
+        rawDiseaseName: formatDiseaseName(params.class)
       }
     });
   };
 
   return (
     <ScrollView className="flex-1 bg-white">
-      <View className="p-4">
-        <Text className="text-2xl font-bold mb-4 text-center">
-          Detection Results
+      <View className="p-6">
+        <Text className="text-3xl font-bold mb-6 text-center text-green-800">
+          Your Results
         </Text>
 
         <Image
           source={{ uri: params.image }}
-          className="w-full h-[300px] rounded-lg mb-4"
+          className="w-[250px] h-[250px] rounded-2xl mb-6 shadow-lg mx-auto"
         />
 
-        <View className="bg-gray-50 p-4 rounded-lg mb-4">
-          <Text className="text-lg font-semibold mb-2">
-            Plant Type: {params.plantType}
-          </Text>
-          <Text className="text-lg font-semibold mb-2">
-            Detected Disease: {params.class}
-          </Text>
-          <Text className="text-lg font-semibold mb-2">
-            Confidence: {(parseFloat(params.confidence) * 100).toFixed(2)}%
-          </Text>
-          <Text className="text-base mb-2">
-            Location: {params.latitude}, {params.longitude}
-          </Text>
+        <View className="bg-green-50 p-6 rounded-2xl mb-6 border-2 border-green-100">
+          <View className="mb-4">
+            <Text className="text-lg text-green-800 mb-1">Your Crop</Text>
+            <Text className="text-2xl font-bold text-green-900 capitalize">
+              {params.plantType}
+            </Text>
+          </View>
+
+          <View className="mb-4">
+            <Text className="text-lg text-green-800 mb-1">Found Disease</Text>
+            <Text className="text-2xl font-bold text-green-900">
+              {formatDiseaseName(params.class)}
+            </Text>
+          </View>
+
+          <View>
+            <Text className="text-lg text-green-800 mb-1">How Sure We Are</Text>
+            <Text className="text-2xl font-bold text-green-900">
+              {(parseFloat(params.confidence) * 100).toFixed(0)}%
+            </Text>
+          </View>
         </View>
 
         <Button
           onPress={handleViewDetails}
-          className="bg-blue-500 mb-4"
+          className="bg-green-600 py-4 mb-4 rounded-xl"
         >
-          <Text className="text-white font-semibold">
-            View Disease Details
+          <Text className="text-white text-lg font-bold">
+            See Treatment Guide
           </Text>
         </Button>
 
         <Button
           onPress={() => router.back()}
-          className="bg-gray-500"
+          className="bg-gray-600 py-4 rounded-xl"
         >
-          <Text className="text-white font-semibold">
-            Back to Camera
+          <Text className="text-white text-lg font-bold">
+            Take Another Photo
           </Text>
         </Button>
       </View>
