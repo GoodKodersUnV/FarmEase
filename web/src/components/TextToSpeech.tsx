@@ -138,23 +138,6 @@ const TextToSpeech: React.FC<TextToSpeechProps> = ({
           <Play className="h-4 w-4" />
         )}
       </Button>
-      
-      <Select
-        value={currentLanguage}
-        onValueChange={handleLanguageChange}
-      >
-        <SelectTrigger className="w-[130px] h-8">
-          <Globe className="h-4 w-4 mr-2" />
-          <SelectValue />
-        </SelectTrigger>
-        <SelectContent className='bg-background'>
-          {languages.map((lang) => (
-            <SelectItem key={lang.code} value={lang.code}>
-              {lang.name}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
     </div>
   );
 };

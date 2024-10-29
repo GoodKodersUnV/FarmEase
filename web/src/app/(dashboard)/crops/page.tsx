@@ -162,7 +162,7 @@ export default function Component() {
   )
 
   return (
-    <div className="min-h-screen p-8">
+    <div className="min-h-screen p-8 bg-gradient-to-b from-green-50 to-white">
       <h1 className="text-4xl font-bold text-center mb-8 text-emerald-800">Farmer's Crop Catalog</h1>
       
       <div className="max-w-md mx-auto mb-8">

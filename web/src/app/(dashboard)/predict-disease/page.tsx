@@ -19,20 +19,32 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
-import { Upload, Loader2 } from "lucide-react";
+import {
+  Upload,
+  Loader2,
+  Leaf,
+  AlertTriangle,
+  CheckCircle2,
+  Info,
+  Globe,
+} from "lucide-react";
 import TextToSpeech from "@/components/TextToSpeech";
+import { Progress } from "@/components/ui/progress";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 const crops = [
-  { value: "potato", label: "Potato" },
-  { value: "tomato", label: "Tomato" },
-  { value: "corn", label: "Corn" },
-  { value: "wheat", label: "Wheat" },
-  { value: "rice", label: "Rice" },
+  { value: "potato", label: "Potato", icon: "🥔" },
+  { value: "tomato", label: "Tomato", icon: "🍅" },
+  { value: "corn", label: "Corn", icon: "🌽" },
+  { value: "wheat", label: "Wheat", icon: "🌾" },
+  { value: "rice", label: "Rice", icon: "🍚" },
 ];
 
 const mockPrediction = {
   disease: "Late Blight",
   confidence: 0.92,
+  severity: "High",
   description:
     "Late blight is a devastating disease of potato and tomato caused by the oomycete pathogen Phytophthora infestans. It can destroy entire fields within days under favorable weather conditions.",
   recommendations: [
@@ -40,6 +52,12 @@ const mockPrediction = {
     "Apply fungicides preventatively",
     "Improve air circulation by proper spacing and pruning",
     "Use resistant varieties when available",
+  ],
+  preventiveMeasures: [
+    "Plant disease-resistant varieties",
+    "Practice crop rotation",
+    "Ensure proper plant spacing for good air circulation",
+    "Avoid overhead irrigation",
   ],
 };
 
@@ -61,6 +79,14 @@ export default function CropDiseasePredictor() {
       reader.readAsDataURL(file);
     }
   };
+  const languages = [
+    { code: "ENG", name: "English" },
+    { code: "hindi", name: "Hindi" },
+    { code: "telugu", name: "Telugu" },
+    { code: "tamil", name: "Tamil" },
+    { code: "kannada", name: "Kannada" },
+  ];
+  const [lang, setLang] = useState("ENG");
 
   const handlePredict = async () => {
     setIsLoading(true);
@@ -72,65 +98,84 @@ export default function CropDiseasePredictor() {
 
   return (
     <div className="container mx-auto p-4 max-w-4xl">
-      <Card>
+      <Card className="bg-gradient-to-br from-green-50 to-blue-50 dark:from-green-900 dark:to-blue-900">
         <CardHeader>
-          <CardTitle>Upload an image of your crop</CardTitle>
+          <CardTitle className="text-2xl font-bold flex items-center gap-2">
+            <Leaf className="h-6 w-6 text-green-600" />
+            Crop Disease Predictor
+          </CardTitle>
           <CardDescription>
-            Select your crop type and upload a clear image of the affected area
-            for analysis.
+            Identify potential diseases in your crops and get expert
+            recommendations.
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid w-full bg-background max-w-sm items-center gap-1.5">
-            <Label htmlFor="crop">Crop Type</Label>
-            <Select value={selectedCrop} onValueChange={setSelectedCrop}>
-              <SelectTrigger>
-                <SelectValue placeholder="Select a crop" />
-              </SelectTrigger>
-              <SelectContent className="bg-background">
-                {crops.map((crop) => (
-                  <SelectItem
-                    key={crop.value}
-                    className="bg-background"
-                    value={crop.value}
-                  >
-                    {crop.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="grid w-full max-w-sm items-center gap-1.5">
-            <Label htmlFor="picture">Crop Image</Label>
-            <div className="flex items-center gap-4">
-              <input
-                id="picture"
-                type="file"
-                accept="image/*"
-                onChange={handleImageUpload}
-                className="hidden"
-              />
-              <Label
-                htmlFor="picture"
-                className="cursor-pointer flex items-center justify-center w-full h-32 border-2 border-dashed rounded-lg hover:bg-gray-50 transition-colors"
-              >
-                {image ? (
-                  <Image
-                    src={image}
-                    alt="Uploaded crop"
-                    width={200}
-                    height={200}
-                    className="max-h-full w-auto"
+        <CardContent className="space-y-6">
+          <div className="grid md:grid-cols-2 gap-6">
+            <div className="space-y-4">
+              <div>
+                <Label htmlFor="crop" className="text-lg font-semibold">
+                  Crop Type
+                </Label>
+                <Select value={selectedCrop} onValueChange={setSelectedCrop}>
+                  <SelectTrigger className="w-full mt-1">
+                    <SelectValue placeholder="Select a crop" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-background">
+                    {crops.map((crop) => (
+                      <SelectItem key={crop.value} value={crop.value}>
+                        <span className="flex items-center gap-2">
+                          {crop.icon} {crop.label}
+                        </span>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label htmlFor="picture" className="text-lg font-semibold">
+                  Crop Image
+                </Label>
+                <div className="mt-1">
+                  <input
+                    id="picture"
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageUpload}
+                    className="hidden"
                   />
-                ) : (
-                  <div className="text-center">
-                    <Upload className="mx-auto h-12 w-12 text-gray-300" />
-                    <span className="mt-2 block text-sm font-semibold text-gray-900">
-                      Upload an image
-                    </span>
-                  </div>
-                )}
-              </Label>
+                  <Label
+                    htmlFor="picture"
+                    className="cursor-pointer flex items-center justify-center w-full h-48 border-2 border-dashed rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+                  >
+                    {image ? (
+                      <Image
+                        src={image}
+                        alt="Uploaded crop"
+                        width={200}
+                        height={200}
+                        className="max-h-full w-auto rounded-lg"
+                      />
+                    ) : (
+                      <div className="text-center">
+                        <Upload className="mx-auto h-12 w-12 text-gray-400" />
+                        <span className="mt-2 block text-sm font-semibold text-gray-900 dark:text-gray-100">
+                          Upload an image
+                        </span>
+                      </div>
+                    )}
+                  </Label>
+                </div>
+              </div>
+            </div>
+            <div className="flex items-center justify-center">
+              <Alert>
+                <AlertTriangle className="h-4 w-4" />
+                <AlertTitle>Tip</AlertTitle>
+                <AlertDescription>
+                  For best results, upload a clear, well-lit image focusing on
+                  the affected area of the plant.
+                </AlertDescription>
+              </Alert>
             </div>
           </div>
         </CardContent>
@@ -138,7 +183,7 @@ export default function CropDiseasePredictor() {
           <Button
             onClick={handlePredict}
             disabled={!image || isLoading}
-            className="w-full bg-green-500 text-white"
+            className="w-full bg-green-600 hover:bg-green-700 text-white"
           >
             {isLoading ? (
               <>
@@ -153,44 +198,118 @@ export default function CropDiseasePredictor() {
       </Card>
 
       {prediction && (
-        <Card className="mt-8">
-          <CardHeader className="relative">
+        <Card className="mt-8 bg-white dark:bg-gray-800">
+          <CardHeader>
             <div className="flex justify-between items-center">
-              <CardTitle>Prediction Results</CardTitle>
-              <TextToSpeech
-                originalText={`Disease detected: ${prediction.disease}. 
+              <CardTitle className="text-2xl font-bold">
+                Prediction Results
+              </CardTitle>
+              <div className="flex items-center gap-2">
+                {lang === "ENG" ? (
+                  <TextToSpeech
+                    originalText={`Disease detected: ${prediction.disease}. 
                         Description: ${prediction.description}. 
                         Recommendations: ${prediction.recommendations.join(
                           ". "
                         )}`}
-                onLanguageChange={(translatedText) => {
-                  // Optional: Handle the translated text if needed
-                  console.log("Translated text:", translatedText);
-                }}
-              />
+                    onLanguageChange={(translatedText) => {
+                      console.log("Translated text:", translatedText);
+                    }}
+                  />
+                ) : (
+                  <audio
+                    src={`/images/${lang}.mp3`}
+                    controls={true}
+                    className="h-12 w-12 text-gray-400}"
+                  />
+                )}
+                <Select value={lang} onValueChange={setLang}>
+                  <SelectTrigger className="w-[130px] h-8">
+                    <Globe className="h-4 w-4 mr-2" />
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent className="bg-background">
+                    {languages.map((lang) => (
+                      <SelectItem
+                        key={lang.code}
+                        value={lang.code}
+                        onClick={() => setLang(lang.code)}
+                      >
+                        {lang.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
           </CardHeader>
-          <CardContent className="space-y-4">
-            <div>
-              <h3 className="text-lg font-semibold">
+          <CardContent className="space-y-6">
+            <div className="flex items-center justify-between">
+              <h3 className="text-xl font-semibold flex items-center gap-2">
+                <AlertTriangle className="h-5 w-5 text-yellow-500" />
                 Detected Disease: {prediction.disease}
               </h3>
-              <p className="text-sm text-gray-500">
-                Confidence: {(prediction.confidence * 100).toFixed(2)}%
-              </p>
+              <div className="text-right">
+                <p className="text-sm text-gray-500 dark:text-gray-400">
+                  Confidence
+                </p>
+                <div className="flex items-center gap-2">
+                  <Progress
+                    value={prediction.confidence * 100}
+                    className="w-24"
+                  />
+                  <span className="font-semibold">
+                    {(prediction.confidence * 100).toFixed(0)}%
+                  </span>
+                </div>
+              </div>
             </div>
-            <div>
-              <h4 className="font-semibold">Description:</h4>
-              <p>{prediction.description}</p>
-            </div>
-            <div>
-              <h4 className="font-semibold">Recommendations:</h4>
-              <ul className="list-disc pl-5 space-y-1">
-                {prediction.recommendations.map((rec, index) => (
-                  <li key={index}>{rec}</li>
-                ))}
-              </ul>
-            </div>
+            <Alert
+              variant={
+                prediction.severity === "High" ? "destructive" : "default"
+              }
+            >
+              <AlertTriangle className="h-4 w-4" />
+              <AlertTitle>Severity: {prediction.severity}</AlertTitle>
+              <AlertDescription>
+                This disease requires immediate attention and treatment.
+              </AlertDescription>
+            </Alert>
+            <Tabs defaultValue="description" className="w-full">
+              <TabsList className="grid w-full grid-cols-3">
+                <TabsTrigger value="description">Description</TabsTrigger>
+                <TabsTrigger value="recommendations">
+                  Recommendations
+                </TabsTrigger>
+                <TabsTrigger value="prevention">Prevention</TabsTrigger>
+              </TabsList>
+              <TabsContent value="description" className="mt-4">
+                <h4 className="font-semibold mb-2 flex items-center gap-2">
+                  <Info className="h-4 w-4" /> About the Disease
+                </h4>
+                <p>{prediction.description}</p>
+              </TabsContent>
+              <TabsContent value="recommendations" className="mt-4">
+                <h4 className="font-semibold mb-2 flex items-center gap-2">
+                  <CheckCircle2 className="h-4 w-4" /> Treatment Recommendations
+                </h4>
+                <ul className="list-disc pl-5 space-y-1">
+                  {prediction.recommendations.map((rec, index) => (
+                    <li key={index}>{rec}</li>
+                  ))}
+                </ul>
+              </TabsContent>
+              <TabsContent value="prevention" className="mt-4">
+                <h4 className="font-semibold mb-2 flex items-center gap-2">
+                  <Leaf className="h-4 w-4" /> Preventive Measures
+                </h4>
+                <ul className="list-disc pl-5 space-y-1">
+                  {prediction.preventiveMeasures.map((measure, index) => (
+                    <li key={index}>{measure}</li>
+                  ))}
+                </ul>
+              </TabsContent>
+            </Tabs>
           </CardContent>
         </Card>
       )}
