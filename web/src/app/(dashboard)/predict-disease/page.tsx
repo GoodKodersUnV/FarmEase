@@ -96,7 +96,7 @@ export default function CropDiseasePredictor() {
     setIsLoading(false);
   };
 
-  const audioRef = useRef(null);
+  const audioRef:any = useRef(null);
   const [isPlaying, setIsPlaying] = useState(false);
 
   const togglePlay = () => {
