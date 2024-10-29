@@ -46,9 +46,16 @@ export default function ProtectedLayout() {
 			<Tabs.Screen name="settings" />
 			<Tabs.Screen name="results" options={{
 				href: null,
+				title: "Results"
 			}} />
 			<Tabs.Screen name="disease-details" options={{
 				href: null,
+				title: "Disease Details"
+			}} />
+
+			<Tabs.Screen name="crop-details/[id]" options={{
+				href: null,
+				title: "Crop Details"
 			}} />
 
 		</Tabs>
