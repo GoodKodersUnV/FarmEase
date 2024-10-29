@@ -21,9 +21,9 @@ export default function ProtectedLayout() {
 				tabBarIcon: ({ focused, color, size }) => {
 					let iconName;
 
-					if (route.name === "home") {
+					if (route.name === "explore") {
 						iconName = focused ? "home" : "home-outline";
-					} else if (route.name === "explore") {
+					} else if (route.name === "home") {
 						iconName = focused ? "search" : "search-outline";
 					} else if (route.name === "settings") {
 						iconName = focused ? "person" : "person-outline";
@@ -37,13 +37,23 @@ export default function ProtectedLayout() {
 				},
 			})}
 		>
+
+			<Tabs.Screen name="explore" options={{
+				title: "Explore"
+			}} />
+
 			<Tabs.Screen name="home" options={{
 				title: "Crop Disease Detection"
 			}} />
-			<Tabs.Screen name="weather" />
-			<Tabs.Screen name="community" />
-			<Tabs.Screen name="explore" />
-			<Tabs.Screen name="settings" />
+			<Tabs.Screen name="weather" options={{
+				title: "Weather"
+			}} />
+			<Tabs.Screen name="community" options={{
+				title: "Community"
+			}} />
+			<Tabs.Screen name="settings" options={{
+				title: "Settings"
+			}} />
 			<Tabs.Screen name="results" options={{
 				href: null,
 				title: "Results"
