@@ -1,14 +1,20 @@
 "use client";
-import Navbar from "../navbar/Navbar";
-import Sidebar from "../sidebar/sidebar";
-import { RxDashboard } from "react-icons/rx";
-import { FaCamera } from "react-icons/fa6";
+
 import { Suspense, useState } from "react";
 import Loading from "@/app/(dashboard)/loading";
 import { User } from "@prisma/client";
 import Link from "next/link";
-import { Leaf } from "lucide-react";
 import { usePathname } from "next/navigation";
+import ThemeSwitch from "../navbar/ThemeSwitch";
+import { 
+  FaHome, 
+  FaSeedling, 
+  FaUsers, 
+  FaStore, 
+  FaRobot, 
+  FaCamera
+} from "react-icons/fa";
+import { Leaf } from "lucide-react";
 
 export default function HomeLayout({
   children,
@@ -19,11 +25,11 @@ export default function HomeLayout({
 }) {
   const [menu, setMenu] = useState<boolean>(true);
   const items = [
-    { name: "Home", icon: <RxDashboard />, path: "/" },
-    { name: "Crops", icon: <RxDashboard />, path: "/crops" },
-    { name: "Community", icon: <RxDashboard />, path: "/community" },
-    { name: "Market", icon: <RxDashboard />, path: "/market" },
-    { name: "Chat-Bot", icon: <RxDashboard />, path: "/chat-bot" }
+    { name: "Home", icon: <FaHome />, path: "/" },
+    { name: "Crops", icon: <FaSeedling />, path: "/crops" },
+    { name: "Community", icon: <FaUsers />, path: "/community" },
+    { name: "Market", icon: <FaStore />, path: "/market" },
+    { name: "Chat-Bot", icon: <FaRobot />, path: "/chat-bot" }
   ];
   const pathname = usePathname();
 
@@ -57,6 +63,7 @@ export default function HomeLayout({
               Login
             </Link>
           )}
+          <ThemeSwitch />
           <Link
             href="/predict-disease"
             className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-transform transform hover:scale-105 flex items-center"
@@ -104,7 +111,7 @@ export default function HomeLayout({
           <div className="flex-grow transition-all ps-60">
             <div className="bg-white shadow-md">
               {children}
-            </div>
+          </div>
           </div>
         </Suspense>
       </div>

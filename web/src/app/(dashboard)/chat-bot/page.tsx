@@ -154,7 +154,7 @@ export default function FarmerAIChatbot() {
   }
 
   return (
-    <div className="h-[91.5vh] max-w-4xl mx-auto p-4">
+    <div className="h-[91.5vh] p-4">
       <Card className="h-full flex flex-col bg-gradient-to-b from-green-50 to-blue-50 dark:from-green-900 dark:to-blue-900">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-2xl font-bold">FarmerAI Assistant</CardTitle>
