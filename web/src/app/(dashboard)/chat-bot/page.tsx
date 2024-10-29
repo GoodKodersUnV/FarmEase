@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import Markdown from 'react-markdown'
 
 interface Message {
   role: 'user' | 'assistant'
@@ -33,12 +34,25 @@ export default function FarmerAIChatbot() {
   const mediaRecorderRef = useRef<MediaRecorder | null>(null)
   const speechSynthRef = useRef<SpeechSynthesis | null>(null)
   const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null)
+  const recognitionRef = useRef<any>(null)
 
   useEffect(() => {
     speechSynthRef.current = window.speechSynthesis
+    if (typeof window !== "undefined") {
+      const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition
+      if (SpeechRecognition) {
+        recognitionRef.current = new SpeechRecognition()
+        recognitionRef.current.continuous = true
+        recognitionRef.current.interimResults = true
+        recognitionRef.current.lang = "en-US"
+      }
+    }
     return () => {
       if (speechSynthRef.current) {
         speechSynthRef.current.cancel()
+      }
+      if (recognitionRef.current) {
+        recognitionRef.current.stop()
       }
     }
   }, [])
@@ -87,44 +101,26 @@ export default function FarmerAIChatbot() {
     }
   }
 
-  // const startRecording = async () => {
-  //   try {
-  //     const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
-  //     const mediaRecorder = new MediaRecorder(stream)
-  //     const audioChunks: Blob[] = []
-
-  //     mediaRecorder.ondataavailable = (event) => {
-  //       audioChunks.push(event.data)
-  //     }
-
-  //     mediaRecorder.onstop = async () => {
-  //       const audioBlob = new Blob(audioChunks, { type: 'audio/wav' })
-  //       const audioUrl = URL.createObjectURL(audioBlob)
-        
-  //       // Convert audio to text using Web Speech API
-  //       const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)()
-  //       recognition.continuous = true
-  //       recognition.lang = 'en-US'
-        
-  //       recognition.onresult = (event) => {
-  //         const transcript = event.results[0][0].transcript
-  //         setInputMessage(transcript)
-  //       }
-        
-  //       recognition.start()
-  //     }
-
-  //     mediaRecorderRef.current = mediaRecorder
-  //     mediaRecorder.start()
-  //     setIsRecording(true)
-  //   } catch (error) {
-  //     console.error('Error accessing microphone:', error)
-  //   }
-  // }
+  const startRecording = () => {
+    if (recognitionRef.current) {
+      recognitionRef.current.onresult = (event: any) => {
+        const transcript = Array.from(event.results)
+          .map((result: any) => result[0])
+          .map(result => result.transcript)
+          .join("")
+        setInputMessage(transcript)
+      }
+      
+      recognitionRef.current.start()
+      setIsRecording(true)
+    } else {
+      console.error("Speech recognition not supported")
+    }
+  }
 
   const stopRecording = () => {
-    if (mediaRecorderRef.current) {
-      mediaRecorderRef.current.stop()
+    if (recognitionRef.current) {
+      recognitionRef.current.stop()
       setIsRecording(false)
     }
   }
@@ -165,20 +161,20 @@ export default function FarmerAIChatbot() {
         </CardHeader>
         <CardContent className="flex-1 p-4 flex flex-col">
           <ScrollArea className="flex-1 pr-4" ref={scrollAreaRef}>
-            <div className="space-y-4">
+            <div className="space-y-4 max-h-[550px] overflow-y-auto p-3">
               {messages.map((message, index) => (
                 <div
                   key={index}
                   className={cn(
                     "flex items-start gap-3 p-4 rounded-lg",
                     message.role === 'user' 
-                      ? "bg-primary-foreground ml-auto" 
+                      ? "bg-gray-100 ml-auto" 
                       : "bg-white dark:bg-gray-800"
                   )}
                   style={{ maxWidth: '80%' }}
                 >
                   <Avatar className={cn(
-                    "h-8 w-8",
+                    "h-8 w-8 flex items-center justify-center",
                     message.role === 'user' ? "bg-primary" : "bg-green-500"
                   )}>
                     {message.role === 'user' ? (
@@ -188,7 +184,9 @@ export default function FarmerAIChatbot() {
                     )}
                   </Avatar>
                   <div className="flex-1 space-y-2">
-                    <p className="text-sm">{message.content}</p>
+                    <p className="text-sm">
+                      <Markdown>{message.content}</Markdown>
+                    </p>
                     <div className="flex items-center justify-between">
                       <span className="text-xs text-muted-foreground">
                         {message.timestamp.toLocaleTimeString()}
@@ -234,15 +232,18 @@ export default function FarmerAIChatbot() {
                     variant="outline"
                     size="icon"
                     className={cn(
-                      "flex-shrink-0",
-                      isRecording && "text-red-500 border-red-500"
+                      "flex-shrink-0 relative",
+                      isRecording && "text-red-500 border-red-500 rounded-full"
                     )}
-                    onClick={isRecording ? stopRecording : ()=>{}}
+                    onClick={isRecording ? stopRecording : startRecording}
                   >
+                    {isRecording && (
+                      <div className="absolute -inset-1 bg-red-100 dark:bg-red-900/20 rounded-full animate-pulse" />
+                    )}
                     {isRecording ? (
-                      <MicOff className="h-5 w-5" />
+                      <MicOff className="h-5 w-5 animate-bounce rounded-full" />
                     ) : (
-                      <Mic className="h-5 w-5" />
+                      <Mic className="h-5 w-5 rounded-full" />
                     )}
                   </Button>
                 </TooltipTrigger>
