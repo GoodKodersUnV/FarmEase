@@ -87,40 +87,40 @@ export default function FarmerAIChatbot() {
     }
   }
 
-  const startRecording = async () => {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
-      const mediaRecorder = new MediaRecorder(stream)
-      const audioChunks: Blob[] = []
+  // const startRecording = async () => {
+  //   try {
+  //     const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
+  //     const mediaRecorder = new MediaRecorder(stream)
+  //     const audioChunks: Blob[] = []
 
-      mediaRecorder.ondataavailable = (event) => {
-        audioChunks.push(event.data)
-      }
+  //     mediaRecorder.ondataavailable = (event) => {
+  //       audioChunks.push(event.data)
+  //     }
 
-      mediaRecorder.onstop = async () => {
-        const audioBlob = new Blob(audioChunks, { type: 'audio/wav' })
-        const audioUrl = URL.createObjectURL(audioBlob)
+  //     mediaRecorder.onstop = async () => {
+  //       const audioBlob = new Blob(audioChunks, { type: 'audio/wav' })
+  //       const audioUrl = URL.createObjectURL(audioBlob)
         
-        // Convert audio to text using Web Speech API
-        const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)()
-        recognition.continuous = true
-        recognition.lang = 'en-US'
+  //       // Convert audio to text using Web Speech API
+  //       const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)()
+  //       recognition.continuous = true
+  //       recognition.lang = 'en-US'
         
-        recognition.onresult = (event) => {
-          const transcript = event.results[0][0].transcript
-          setInputMessage(transcript)
-        }
+  //       recognition.onresult = (event) => {
+  //         const transcript = event.results[0][0].transcript
+  //         setInputMessage(transcript)
+  //       }
         
-        recognition.start()
-      }
+  //       recognition.start()
+  //     }
 
-      mediaRecorderRef.current = mediaRecorder
-      mediaRecorder.start()
-      setIsRecording(true)
-    } catch (error) {
-      console.error('Error accessing microphone:', error)
-    }
-  }
+  //     mediaRecorderRef.current = mediaRecorder
+  //     mediaRecorder.start()
+  //     setIsRecording(true)
+  //   } catch (error) {
+  //     console.error('Error accessing microphone:', error)
+  //   }
+  // }
 
   const stopRecording = () => {
     if (mediaRecorderRef.current) {
@@ -237,7 +237,7 @@ export default function FarmerAIChatbot() {
                       "flex-shrink-0",
                       isRecording && "text-red-500 border-red-500"
                     )}
-                    onClick={isRecording ? stopRecording : startRecording}
+                    onClick={isRecording ? stopRecording : ()=>{}}
                   >
                     {isRecording ? (
                       <MicOff className="h-5 w-5" />

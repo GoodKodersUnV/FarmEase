@@ -82,7 +82,7 @@ const HomePage = () => {
   );
 };
 
-const FeatureCard = ({ icon, title, description }) => (
+const FeatureCard = ({ icon, title, description }: any) => (
   <div className="p-6 border border-gray-100 rounded-xl shadow-md transition-all duration-300 transform hover:shadow-2xl hover:scale-105 hover:bg-green-50">
     <div className="mb-4">{icon}</div>
     <h3 className="text-xl font-semibold text-gray-800 mb-2">{title}</h3>
@@ -90,7 +90,7 @@ const FeatureCard = ({ icon, title, description }) => (
   </div>
 );
 
-const StatCard = ({ number, label }) => (
+const StatCard = ({ number, label }: any) => (
   <div className="transition-transform transform hover:scale-105 duration-300">
     <div className="text-4xl font-bold text-green-600 mb-2">{number}</div>
     <div className="text-gray-600">{label}</div>

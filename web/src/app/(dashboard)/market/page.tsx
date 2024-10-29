@@ -71,8 +71,9 @@ export default function FarmerStore() {
       product.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const addToCart = (product) => {
-    setCart([...cart, product]);
+  const addToCart = (product: any) => {
+    const newCart: any = [...cart, product];
+    setCart(newCart);
   };
 
   return (
@@ -110,10 +111,9 @@ export default function FarmerStore() {
         {categories.map((category) => (
           <Button
             key={category}
-            variant={selectedCategory === category ? "solid" : "outline"}
-            className={`text-sm font-medium rounded-full px-4 py-2 ${
-              selectedCategory === category ? "bg-emerald-600 text-white" : "text-emerald-600 border-emerald-600"
-            }`}
+            variant={selectedCategory === category ? "default" : "outline"}
+            className={`text-sm font-medium rounded-full px-4 py-2 ${selectedCategory === category ? "bg-emerald-600 text-white" : "text-emerald-600 border-emerald-600"
+              }`}
             onClick={() => setSelectedCategory(category)}
           >
             {category}

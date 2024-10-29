@@ -163,8 +163,8 @@ function page({ params }: any) {
         <div className="bg-white rounded-lg shadow-xl overflow-hidden">
           <div className="relative h-64 sm:h-80">
             <Image
-              src={crop?.image}
-              alt={crop?.name}
+              src={crop?.image || ""}
+              alt={crop?.name || ""}
               layout="fill"
               objectFit="cover"
               className="object-center"
