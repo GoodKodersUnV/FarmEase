@@ -524,10 +524,9 @@ export default function CropDetailsScreen() {
     <ScrollView className="flex-1 bg-white">
       {/* Header Image */}
       <View className="relative h-72">
-        <Image
-          source={{ uri: crop.image }}
+        <img
+          src={crop.image}
           className="w-full h-full"
-          resizeMode="cover"
         />
         <TouchableOpacity
           className="absolute top-12 left-6 bg-white p-2 rounded-full"
