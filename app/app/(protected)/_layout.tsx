@@ -1,16 +1,30 @@
 import { Ionicons } from "@expo/vector-icons";
-import { Tabs } from "expo-router";
+import { Tabs, useRouter } from "expo-router";
 import React from "react";
 import { theme } from "@/lib/constants";
 import { useColorScheme } from "@/lib/useColorScheme";
+import { TouchableOpacity } from "react-native";
 
 export default function ProtectedLayout() {
 	const { colorScheme } = useColorScheme();
+	const router = useRouter();
 
 	return (
 		<Tabs
 			screenOptions={({ route }) => ({
 				headerShown: true,
+				headerRight: () => (
+					<TouchableOpacity 
+						onPress={() => router.push("/notifications")}
+						style={{ marginRight: 15 }}
+					>
+						<Ionicons 
+							name="notifications-outline" 
+							size={24} 
+							color={colorScheme === "dark" ? "white" : "black"} 
+						/>
+					</TouchableOpacity>
+				),
 				tabBarStyle: {
 					backgroundColor:
 						colorScheme === "dark"
@@ -66,6 +80,11 @@ export default function ProtectedLayout() {
 			<Tabs.Screen name="crop-details/[id]" options={{
 				href: null,
 				title: "Crop Details"
+			}} />
+
+			<Tabs.Screen name="notifications" options={{
+				href: null,
+				title: "Notifications"
 			}} />
 
 		</Tabs>
