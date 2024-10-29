@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import {
@@ -94,6 +94,18 @@ export default function CropDiseasePredictor() {
     await new Promise((resolve) => setTimeout(resolve, 2000));
     setPrediction(mockPrediction);
     setIsLoading(false);
+  };
+
+  const audioRef = useRef(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+
+  const togglePlay = () => {
+    if (isPlaying) {
+      audioRef.current.pause();
+    } else {
+      audioRef.current.play();
+    }
+    setIsPlaying(!isPlaying);
   };
 
   return (
@@ -205,6 +217,11 @@ export default function CropDiseasePredictor() {
                 Prediction Results
               </CardTitle>
               <div className="flex items-center gap-2">
+                <audio
+                  ref={audioRef}
+                  src={`/images/${lang}.mp3`}
+                  className="hidden"
+                />
                 {lang === "ENG" ? (
                   <TextToSpeech
                     originalText={`Disease detected: ${prediction.disease}. 
@@ -217,11 +234,32 @@ export default function CropDiseasePredictor() {
                     }}
                   />
                 ) : (
-                  <audio
-                    src={`/images/${lang}.mp3`}
-                    controls={true}
-                    className="h-12 w-12 text-gray-400}"
-                  />
+                  <button
+                    onClick={togglePlay}
+                    className={`flex items-center justify-center w-8 h-8 rounded-full bg-background text-black shadow-md hover:bg-background focus:outline-none focus:ring-2 focus:ring-background-400 focus:ring-opacity-50 transition-all duration-300`}
+                  >
+                    {isPlaying ? (
+                      // Stop icon (pause)
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-6 w-6"
+                        fill="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path d="M10 19H6V5h4v14zm8-14h-4v14h4V5z" />
+                      </svg>
+                    ) : (
+                      // Play icon
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-6 w-6"
+                        fill="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path d="M8 5v14l11-7z" />
+                      </svg>
+                    )}
+                  </button>
                 )}
                 <Select value={lang} onValueChange={setLang}>
                   <SelectTrigger className="w-[130px] h-8">
